@@ -1,39 +1,81 @@
-Step 1: Finding the Rules
-I looked around the dashboard and saw a big button at the bottom: "Steal Captain's Rulebook (Download Source)".
+Step 1: Reconnaissance (The Broken Dashboard)
+I started by accessing the web interface and was greeted by a pirate-themed login screen. Since I didn't have specific credentials, I tried standard guesses.
 
-I downloaded the zip file and extracted it. Inside, there were four Python files. The most interesting one was state_machine.py. This file basically contained the "laws" of the ship. It showed exactly what numbers you need to move from one rank to the next.
+Input: Any string (e.g., admin / password or guest / guest)
 
-Step 2: Doing the Math
-I read the code and realized I needed to build a "trace"—basically a history of my career as a pirate—and send it to the server. The server doesn't check when I did these things; it just checks if the numbers add up.
+Result: Success! I was logged in.
 
-Here is the math I had to figure out to pass the checks:
+The Dashboard showed my current status as S0 (Landlubber). There was a visual map leading all the way to S6 (Pirate Lord), but there were no buttons to advance the workflow.
 
-Loyalty (KYC): To get past rank S1, I needed a score over 85. I picked 90.
+However, a warning message at the bottom gave me a critical lead:
 
-Risk: The rules said Risk + Loyalty must equal 100 at the end. Since my Loyalty was 90, my Risk had to be 10.
+"Automated transition failed. Manual intervention via /appeal API required."
 
-Approvals: To get past rank S3, I needed at least 2 approvals. I gave myself 5 just to be safe.
+Step 2: The Missing Link (Finding the Source Code)
+While inspecting the dashboard for a way to use that API, I noticed a distinct section at the bottom labeled "Steal Captain's Rulebook (Download Source)".
 
-The Final Gate: To reach the final rank (S6), the "Audit Depth" had to be exactly 1 higher than my "Appeals". Since I had 0 appeals, my Audit Depth needed to be 1.
+I clicked it and downloaded a file named source_code.zip. This was the breakthrough I needed! instead of guessing blindly, I now had the actual Python logic the server uses to check my rank. Inside the zip, I found state_machine.py, which contained all the rules.
 
-Step 3: Faking the History (The Exploit)
-Now that I had the magic numbers (90, 10, 5, 1), I had to construct a fake history. I created a JSON list that showed me going from S0 all the way to S6, step-by-step.
+Step 3: Analyzing the Logic (The State Machine)
+I opened state_machine.py to understand how the server verifies the "Appeal." I realized the server expects a Trace—a JSON list representing the history of my rank from S0 to S6.
 
-It looked something like this:
+The code enforced strict mathematical rules to move from one state to the next:
 
-Step 1 (S0): I started with nothing.
+S0 → S1: Time (epoch) must increase.
 
-Step 2 (S1): I suddenly had 90 Loyalty and 10 Risk.
+S1 → S2: kyc_score must be ≥ 85.
 
-Step 3 to Step 7: I kept those numbers the same for every step until I reached S6.
+S2 → S3: risk_score must be ≤ (100 - kyc_score).
 
-Step 4: Getting the Flag
-I sent this JSON data to the /appeal endpoint using a tool called Postman (you can use curl too).
+S3 → S4: approvals must be ≥ 2.
 
-The server checked my math, saw that it followed all the rules, and replied:
+S4 → S5: audit_depth must be < 3 AND appeals must be 0.
 
-"ACCEPTED"
+S5 → S6 (The Goal): audit_depth must equal appeals + 1 AND (kyc_score + risk_score == 100).
 
-It gave me a special cookie called compliance_auth. I went to the /flag page with that cookie, and there it was!
+Step 4: Solving the Constraints (The Math)
+This is basically a math puzzle. To reach S6, I had to pick specific numbers that satisfied all the previous rules at the same time. I worked backward from the goal:
 
-Flag: Savvy{W1WJ_X_73CN0_F3$T}
+Target (S6): I need kyc + risk == 100. Let's pick KYC=90 and Risk=10.
+
+Audit Rule: I need audit == appeals + 1. Let's set Appeals=0. This means my Audit Depth must be 1.
+
+Verification:
+
+Does S5 allow Audit=1? Yes (1 < 3).
+
+Does S3 allow Risk=10 if KYC is 90? Yes (100 - 90 = 10, and 10 ≤ 10).
+
+Does S1 allow KYC=90? Yes (90 ≥ 85).
+
+Step 5: The Exploit (Constructing the Trace)
+With my numbers ready, I constructed a JSON payload containing the full history (S0 to S6).
+
+The Payload:
+
+[
+  { "name": "S0", "epoch": 0, "kyc_score": 0, "risk_score": 0, "audit_depth": 0, "approvals": 0, "appeals": 0, "compliance_flags": 0 },
+  { "name": "S1", "epoch": 1, "kyc_score": 90, "risk_score": 0, "audit_depth": 0, "approvals": 0, "appeals": 0, "compliance_flags": 0 },
+  { "name": "S2", "epoch": 2, "kyc_score": 90, "risk_score": 0, "audit_depth": 0, "approvals": 0, "appeals": 0, "compliance_flags": 0 },
+  { "name": "S3", "epoch": 3, "kyc_score": 90, "risk_score": 10, "audit_depth": 0, "approvals": 0, "appeals": 0, "compliance_flags": 0 },
+  { "name": "S4", "epoch": 4, "kyc_score": 90, "risk_score": 10, "audit_depth": 0, "approvals": 5, "appeals": 0, "compliance_flags": 0 },
+  { "name": "S5", "epoch": 5, "kyc_score": 90, "risk_score": 10, "audit_depth": 1, "approvals": 5, "appeals": 0, "compliance_flags": 0 },
+  { "name": "S6", "epoch": 6, "kyc_score": 90, "risk_score": 10, "audit_depth": 1, "approvals": 5, "appeals": 0, "compliance_flags": 0 }
+]
+
+Step 6: Collecting the Loot
+I sent this payload to the /appeal endpoint using curl (you can also use Burp Suite).
+
+Server Response: {"result": "ACCEPTED", "status": "Compliance Verified"}
+
+Cookie Received: compliance_auth=VALID_PROOF_SUBMITTED
+
+Now that I had the session cookie proving I "passed the audit," I simply visited the flag URL:
+
+Request: GET /flag (with the new Cookie)
+
+Server Response:
+
+{
+ "flag": "Savvy{W1WJ_X_73CN0_F3$T}"
+}
