@@ -1,11 +1,11 @@
-# 🏴‍☠️ Whitecap Bay: Whispers in the Source — CTF Writeup
+# 🏴‍☠️ Whispers in the Source — CTF Writeup
 
 ## Challenge Information
-- **Challenge Name:** Whitecap Bay - Whispers in the Source  
+- **Challenge Name:** Whispers in the Source  
 - **Category:** Web Exploitation  
 - **Difficulty:** Medium  
 - **Points:** 350  
-- **Flag:** `WHITECAP{client_side_whispers_betray_the_server}`  
+- **Flag:** `SAVVY{br0w53r_15_n0t_l0y4l}`  
 
 ---
 
@@ -224,7 +224,7 @@ GET /vault/final?code=PEARLCOMPASSCODE
 ### Response
 
 ```
-WHITECAP{client_side_whispers_betray_the_server}
+SAVVY{br0w53r_15_n0t_l0y4l}
 ```
 
 ---
@@ -254,11 +254,11 @@ All security decisions were made in JavaScript, allowing total control by the at
 ## 📌 Flag
 
 ```
-WHITECAP{client_side_whispers_betray_the_server}
+SAVVY{br0w53r_15_n0t_l0y4l}
 ```
 
 ---
 
-**CTF:** Whitecap Bay  
+**CTF:** Whispers in the Source  
 **Challenge:** Whispers in the Source  
-**Writeup by:** Muhammad Haris 🏴‍☠️
+**Writeup by:** DarkPulseX 🏴‍☠️
