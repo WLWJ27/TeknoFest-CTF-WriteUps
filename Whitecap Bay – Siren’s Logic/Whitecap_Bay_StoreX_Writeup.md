@@ -1,11 +1,11 @@
-# 🏴‍☠️ Whitecap Bay: StoreX — CTF Writeup
+# 🏴‍☠️ Whitecap Bay – Siren’s Logic
 
 ## Challenge Information
-- **Challenge Name:** Whitecap Bay - StoreX  
+- **Challenge Name:** Whitecap Bay – Siren’s Logic  
 - **Category:** Web Exploitation  
 - **Difficulty:** Hard  
 - **Points:** 500  
-- **Flag:** `STOREX{burp_can_break_logic_not_crypto}`  
+- **Flag:** `SAVVY{s1r3n_l0g1c}`  
 
 ---
 
@@ -239,7 +239,7 @@ Modified request:
 ### Response
 
 ```
-STOREX{burp_can_break_logic_not_crypto}
+SAVVY{s1r3n_l0g1c}
 ```
 
 Treasure successfully claimed.
@@ -271,11 +271,11 @@ The OTP system was not broken through brute force — it was bypassed by underst
 ## 📌 Flag
 
 ```
-STOREX{burp_can_break_logic_not_crypto}
+SAVVY{s1r3n_l0g1c}
 ```
 
 ---
 
-**CTF Name:** Whitecap Bay  
-**Challenge:** StoreX  
-**Writeup by:** Muhammad Haris 🧑‍💻🏴‍☠️
+**CTF Name:**Whitecap Bay – Siren’s Logic  
+**Challenge:** Siren’s Logic  
+**Writeup by:** DarkPulseX 🧑‍💻🏴‍☠️
